@@ -28,7 +28,6 @@ import ai.qleap.mwe.data.Documents;
 import ai.qleap.mwe.data.MWEs;
 import ai.qleap.mwe.services.MapToTopics;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
