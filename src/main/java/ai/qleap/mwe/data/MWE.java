@@ -24,22 +24,39 @@
 
 package ai.qleap.mwe.data;
 
+import ai.qleap.mwe.services.MWEExtractor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonAutoDetect
-public class MWEs {
-    @JsonProperty("mwes")
-    List<MWE> mwes;
+@NoArgsConstructor
+@Getter
+@Setter
+public final class MWE {
+    @JsonProperty("mwe")
+    String mwe;
+    @JsonProperty("tokens")
+    List<String> toks;
+    @JsonProperty("count")
+    AtomicInteger count = new AtomicInteger(0);
+    @JsonProperty("pmi")
+    double pmi;
+    @JsonProperty("npmi")
+    double npmi;
 
+    public MWE(MWE ci){
+        this.mwe = ci.mwe;
+        this.toks = ci.toks;
+    }
+
+    public MWE(String mwe, List<String> toks) {
+        this.mwe = mwe;
+        this.toks = toks;
+    }
 }

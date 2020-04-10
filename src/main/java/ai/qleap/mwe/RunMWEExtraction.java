@@ -22,24 +22,36 @@
  * SOFTWARE.
  */
 
-package ai.qleap.mwe.data;
+package ai.qleap.mwe;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import ai.qleap.mwe.data.Documents;
+import ai.qleap.mwe.data.MWE;
+import ai.qleap.mwe.data.MWEs;
+import ai.qleap.mwe.services.MWEExtractor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonAutoDetect
-public class MWEs {
-    @JsonProperty("mwes")
-    List<MWE> mwes;
+public class RunMWEExtraction {
 
+    public static void main(String [] args) {
+
+        ObjectMapper mapper = new ObjectMapper();
+        // JSON file to Java object
+        try {
+            Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs_sample.json"), Documents.class);
+            System.out.println(docs.getDocs().size());
+            Map<String, MWE> map = new MWEExtractor(docs).run();
+//            map.values().stream().map(c-> new MWEs.MWE()).collect(Collectors.toList())
+            MWEs mwes = new MWEs(new ArrayList<>(map.values()));
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes.json"), mwes);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

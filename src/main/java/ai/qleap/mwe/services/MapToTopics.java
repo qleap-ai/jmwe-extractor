@@ -22,35 +22,39 @@
  * SOFTWARE.
  */
 
-package ai.qleap.mwe;
+package ai.qleap.mwe.services;
 
 import ai.qleap.mwe.data.Documents;
+import ai.qleap.mwe.data.MWE;
 import ai.qleap.mwe.data.MWEs;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
 
-public class Run {
+public class MapToTopics {
+    private final MWEs mwes;
+    private final Documents docs;
+    private final MatchMWEs matcher;
 
-    public static void main(String [] args) {
+    public MapToTopics(MWEs mwes, Documents docs) {
+        this.mwes = mwes;
+        this.docs = docs;
+        this.matcher = new MatchMWEs(mwes);
+    }
 
-        ObjectMapper mapper = new ObjectMapper();
-        // JSON file to Java object
-        try {
-            Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs_sample.json"), Documents.class);
-            System.out.println(docs.getDocs().size());
-            Map<String, MWEExtractor.CandInfo> map = new MWEExtractor(docs).run();
-//            map.values().stream().map(c-> new MWEs.MWE()).collect(Collectors.toList())
-            MWEs mwes = new MWEs(new ArrayList<>(map.values()));
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes.json"), mwes);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void run(String topic) {
+        int processed = 0;
+        int next = 1;
+        for (Documents.Document doc : this.docs.getDocs()) {
+            if (processed >= next){
+                next *= 2;
+                System.out.println("processed " + processed + " out of " + this.docs.getDocs().size());
+            }
+            processed++;
+            if (doc.getClazz().equals(topic)){
+                List<MWE> myMwes = matcher.matchMWEs(doc.getText());
+//                System.out.println(myMwes.size());
+            }
         }
+
     }
 }

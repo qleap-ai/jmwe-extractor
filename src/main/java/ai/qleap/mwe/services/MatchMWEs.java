@@ -22,37 +22,45 @@
  * SOFTWARE.
  */
 
-package ai.qleap.mwe.data;
+package ai.qleap.mwe.services;
 
+import ai.qleap.mwe.data.MWE;
+import ai.qleap.mwe.data.MWEs;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Getter
-public class Documents {
+public class MatchMWEs {
 
-    List<Document> docs;
+    private final Map<String, MWE> mwes = new HashMap<>();
 
-//    @JsonIgnoreProperties(ignoreUnknown = true)
-    @Getter
-    public static final class Document {
-        @JsonProperty("doc_id")
-        String doc_id;
-        @JsonProperty("text")
-        String text;
-        @JsonProperty("pattern")
-        String pattern;
-        @JsonProperty("kw_length")
-        Integer kw_length;
-        @JsonProperty("corpus")
-        String corpus;
-        @JsonProperty("paper_id")
-        String paper_id;
-        @JsonProperty("class")
-        String clazz;
+    public MatchMWEs(MWEs mwes) {
+        mwes.getMwes().stream().forEach(m -> this.mwes.put(m.getMwe(), m));
+    }
+
+    public List<MWE> matchMWEs(String text) {
+        String[] words = text.split("\\s+");
+        List<String> cands = new ArrayList<>();
+        for (int i = 0; i < words.length - 1; i++) {
+            StringBuilder sb = new StringBuilder();
+            String w = words[i];
+            sb.append(w);
+            for (int j = i + 1; j < Math.min(words.length - 1, i + MWEExtractor.NGRAMM); j++) {
+                sb.append("_");
+                String w2 = words[j];
+                sb.append(w2);
+                cands.add(sb.toString());
+            }
+        }
+        List<MWE> mwes = new ArrayList<>();
+        for (String cand : cands) {
+            MWE mwe = this.mwes.get(cand);
+            if (mwe != null) {
+                mwes.add(mwe);
+            }
+        }
+        return mwes;
     }
 }
