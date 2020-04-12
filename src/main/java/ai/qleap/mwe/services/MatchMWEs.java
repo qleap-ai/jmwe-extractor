@@ -27,17 +27,18 @@ package ai.qleap.mwe.services;
 import ai.qleap.mwe.data.MWE;
 import ai.qleap.mwe.data.MWEs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MatchMWEs {
 
     private final Map<String, MWE> mwes = new HashMap<>();
 
     public MatchMWEs(MWEs mwes) {
-        mwes.getMwes().stream().forEach(m -> this.mwes.put(m.getMwe(), m));
+        this(mwes.getMwes());
+    }
+
+    public MatchMWEs(Collection<MWE> mwes) {
+        mwes.stream().forEach(m -> this.mwes.put(m.getMwe(), m));
     }
 
     public List<MWE> matchMWEs(String text) {
