@@ -47,12 +47,12 @@ public class RunMWEsToTopics {
 
             MWEs mwes = mapper.readValue(new File("mwes_full_corpus_bi_to_4-grams.json"), MWEs.class);
             System.out.println("total mwes: "+ mwes.getMwes().size());
-            mwes.getMwes().removeIf(next -> next.getNpmi() < 0.5);
+//            mwes.getMwes().removeIf(next -> next.getNpmi() < 0.5);
             System.out.println("cleand mwes: "+ mwes.getMwes().size());
             Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs.json"), Documents.class);
-            Collections.shuffle(docs.getDocs());
-            Random r = new Random(42);
-            docs.getDocs().removeIf(next->r.nextDouble()>0.1);
+//            Collections.shuffle(docs.getDocs());
+//            Random r = new Random(42);
+//            docs.getDocs().removeIf(next->r.nextDouble()>0.1);
             System.out.println("total docs: " + docs.getDocs().size());
             Set<String> classes = docs.getDocs().parallelStream().map(Documents.Document::getClazz).collect(Collectors.toSet());
             System.out.println("total classes: " + classes.size());
