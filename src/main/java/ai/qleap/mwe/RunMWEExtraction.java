@@ -46,7 +46,7 @@ public class RunMWEExtraction {
             System.out.println(docs.getDocs().size());
             Map<String, MWE> map = new MWEExtractor(docs).run();
 //            map.values().stream().map(c-> new MWEs.MWE()).collect(Collectors.toList())
-            MWEs mwes = new MWEs(new ArrayList<>(map.values()));
+            MWEs mwes = new MWEs(new ArrayList<>(map.values()),new ArrayList<>());
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes.json"), mwes);
 
 

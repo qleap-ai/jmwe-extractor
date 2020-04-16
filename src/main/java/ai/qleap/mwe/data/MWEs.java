@@ -42,4 +42,6 @@ public class MWEs {
     @JsonProperty("mwes")
     List<MWE> mwes;
 
+    @JsonProperty("classes")
+    List<String> classes;
 }

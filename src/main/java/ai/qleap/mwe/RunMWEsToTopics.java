@@ -31,34 +31,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RunMWEsToTopics {
 
-    public static void main(String ... args) {
+    public static void main(String... args) {
         ObjectMapper mapper = new ObjectMapper();
         // JSON file to Java object
         try {
 //            Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs.json"), Documents.class);
 //            System.out.println(docs.getDocs().size());
-
+            Random r = new Random(42);
             MWEs mwes = mapper.readValue(new File("mwes_full_corpus_bi_to_4-grams.json"), MWEs.class);
-            System.out.println("total mwes: "+ mwes.getMwes().size());
+            System.out.println("total mwes: " + mwes.getMwes().size());
 //            mwes.getMwes().removeIf(next -> next.getNpmi() < 0.5);
+//            mwes.getMwes().removeIf(next -> r.nextDouble() > 0.01);
             System.out.println("cleand mwes: "+ mwes.getMwes().size());
             Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs.json"), Documents.class);
 //            Collections.shuffle(docs.getDocs());
-//            Random r = new Random(42);
-//            docs.getDocs().removeIf(next->r.nextDouble()>0.1);
+
+//            docs.getDocs().removeIf(next -> r.nextDouble() > 1.);
+//            docs.getDocs().removeIf(next->!next.getClazz().equals("Outcomes"));
             System.out.println("total docs: " + docs.getDocs().size());
             Set<String> classes = docs.getDocs().parallelStream().map(Documents.Document::getClazz).collect(Collectors.toSet());
             System.out.println("total classes: " + classes.size());
             System.out.println(classes);
-            for (String cl : classes){
-                System.out.println("running: "+cl);
+            mwes.setClasses(new ArrayList<>(classes));
+            for (String cl : classes) {
+                System.out.println("running: " + cl);
                 new MapToTopics(mwes, docs).run(cl);
             }
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes_full_corpus_bi_to_4-grams_chi2.json"), mwes);

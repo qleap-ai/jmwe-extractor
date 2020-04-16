@@ -98,6 +98,34 @@ public class MapToTopics {
         System.out.println("Positive + Negative corpus size: " + topicDocs.size());
         System.out.println("Num MWEs: " + myMWEs.size());
         rankMWEs(topicDocs, myMWEs, topic);
+        normalizeChi2(myMWEs,topic);
+    }
+
+    private void normalizeChi2(Map<MWE, AtomicInteger> myMWEs, String topic) {
+        System.out.println("Computing relevancy weights");
+        for (int i = 2; i <= NGRAMM; i++) {
+            double max = 0;
+            double min = Double.POSITIVE_INFINITY;
+            for (MWE mwe : myMWEs.keySet()){
+                if (mwe.getToks().size() != i) {
+                    continue;
+                }
+                if (mwe.getTopicScores().get(topic) > max) {
+                    max = mwe.getTopicScores().get(topic);
+                }
+                if (mwe.getTopicScores().get(topic) < min) {
+                    min = mwe.getTopicScores().get(topic);
+                }
+            }
+            for (MWE mwe : myMWEs.keySet()) {
+                if (mwe.getToks().size() != i) {
+                    continue;
+                }
+                double chi2 = mwe.getTopicScores().get(topic);
+                mwe.getTopicScores().put(topic, (chi2-min)/(max-min));
+            }
+
+        }
     }
 
     private void rankMWEs(List<Documents.Document> topicDocs, Map<MWE, AtomicInteger> myMWEs, String topic) {
