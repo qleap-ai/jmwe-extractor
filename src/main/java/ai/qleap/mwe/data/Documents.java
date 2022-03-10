@@ -53,6 +53,8 @@ public class Documents {
         @JsonProperty("speaker")
         String speaker;
 
+        @JsonProperty("pile_set_name")
+        String pileSet;
 
 //        "speaker": "Speaker 1", "time": "00:00:07", "interviewee":
     }

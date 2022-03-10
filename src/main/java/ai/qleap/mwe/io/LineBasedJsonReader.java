@@ -69,7 +69,7 @@ public class LineBasedJsonReader {
         final AtomicInteger total = new AtomicInteger(0);
         final AtomicInteger failed = new AtomicInteger(0);
 
-        try (Stream<String> lines = new BufferedReader(new InputStreamReader(stream)).lines()) {
+        try (Stream<String> lines = new BufferedReader(new InputStreamReader(stream)).lines();) {
             lines
                     .map(line -> {
                         try {

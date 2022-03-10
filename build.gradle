@@ -31,5 +31,9 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
 
+//    // https://mvnrepository.com/artifact/com.github.luben/zstd-jni
+//    implementation group: 'com.github.luben', name: 'zstd-jni', version: '1.5.2-2'
+
+
 
 }

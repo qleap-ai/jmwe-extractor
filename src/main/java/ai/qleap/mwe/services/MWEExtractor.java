@@ -51,7 +51,7 @@ public class MWEExtractor {
     public Map<String, MWE> run() {
         double total = this.docs.getDocs().size();
         AtomicInteger processed = new AtomicInteger(0);
-        this.docs.getDocs().stream().map(Documents.Document::getText).peek(t -> {
+        this.docs.getDocs().stream().filter(d-> d.getMeta().getPileSet().equals("StackExchange")).map(Documents.Document::getText).peek(t -> {
             int pp = processed.incrementAndGet();
             if (pp % 1000 == 0) {
                 System.out.println(pp + " of " + total + " cands thus far " + candMWEs.size());
