@@ -43,7 +43,7 @@ public class RunMWEExtraction {
         // JSON file to Java object
         try {
             LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
-            Documents docs = parser.parseFile("business_journeys.jsonl");
+            Documents docs = parser.parseFile("business_journeys.jsonl",0.03);
 
 //                    mapper.readValue(new File("business_journeys.jsonl"), Documents.class);
             System.out.println(docs.getDocs().size());

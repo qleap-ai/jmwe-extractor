@@ -56,7 +56,7 @@ public class MWECounter {
             System.out.println("cleand mwes: "+ mwes.getMwes().size());
             MatchMWEs matcher = new MatchMWEs(mwes);
             LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
-            Documents docs = parser.parseFile("business_journeys.jsonl");
+            Documents docs = parser.parseFile("business_journeys.jsonl",1.);
             MWECounter counter = new MWECounter(matcher);
             docs.getDocs().parallelStream().forEach(counter::handle);
             mwes.setCounts(counter.mweCount);
