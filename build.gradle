@@ -13,8 +13,8 @@ repositories {
 }
 
 application {
-    mainClassName = 'ai.qleap.mwe.RunMWEsToTopics'
-    applicationDefaultJvmArgs = ['-Xmx48g']
+    mainClassName = 'ai.qleap.mwe.RunMWEExtraction'
+    applicationDefaultJvmArgs = ['-Xmx192g']
 }
 
 dependencies {
