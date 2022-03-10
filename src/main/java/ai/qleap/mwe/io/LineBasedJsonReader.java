@@ -94,7 +94,7 @@ public class LineBasedJsonReader {
 
     public Documents parseFile(String fileName) throws FileNotFoundException {
         Documents docs = new Documents();
-        Consumer<? super Object> consumer = new DocumentConsumer(docs,0.1);
+        Consumer<? super Object> consumer = new DocumentConsumer(docs,0.03);
         parseAsStream(new FileInputStream(fileName), Documents.Document.class,consumer);
         System.out.println(docs.getDocs().size());
         return docs;
