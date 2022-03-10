@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MWECounter {
 
     private final MatchMWEs matcher;
-    Map<String, AtomicInteger> mweCount = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, AtomicInteger> mweCount = new ConcurrentHashMap<>();
 
     public MWECounter(MatchMWEs matcher){
         this.matcher = matcher;

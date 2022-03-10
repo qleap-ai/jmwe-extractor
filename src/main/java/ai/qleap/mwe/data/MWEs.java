@@ -34,6 +34,7 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Setter
@@ -49,5 +50,5 @@ public class MWEs {
     List<String> classes;
 
     @JsonProperty("topiccounts")
-    Map<String, AtomicInteger> counts = new HashMap<>();
+    ConcurrentHashMap<String, AtomicInteger> counts = new ConcurrentHashMap<>();
 }

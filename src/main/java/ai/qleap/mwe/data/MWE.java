@@ -35,6 +35,7 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @JsonAutoDetect
@@ -53,7 +54,7 @@ public final class MWE {
     @JsonProperty("npmi")
     double npmi;
 
-    Map<String,AtomicInteger> topicScores = new HashMap<>();
+    ConcurrentHashMap<String,AtomicInteger> topicScores = new ConcurrentHashMap<>();
 
     public MWE(MWE ci){
         this.mwe = ci.mwe;
