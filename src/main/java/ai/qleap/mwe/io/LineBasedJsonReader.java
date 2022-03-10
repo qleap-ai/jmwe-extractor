@@ -35,6 +35,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -93,7 +94,7 @@ public class LineBasedJsonReader {
 
     public Documents parseFile(String fileName) throws FileNotFoundException {
         Documents docs = new Documents();
-        Consumer<? super Object> consumer = new DocumentConsumer(docs);
+        Consumer<? super Object> consumer = new DocumentConsumer(docs,0.001);
         parseAsStream(new FileInputStream(fileName), Documents.Document.class,consumer);
         System.out.println(docs.getDocs().size());
         return docs;
@@ -102,13 +103,20 @@ public class LineBasedJsonReader {
     private static class DocumentConsumer implements Consumer<Object> {
 
         private final Documents docs;
+        private final double sample;
+//        private long cnt = 0;`
+        private final Random random = new Random();
 
-        public DocumentConsumer(Documents docs) {
+        public DocumentConsumer(Documents docs, double sample) {
             this.docs = docs;
+            this.sample = sample;
         }
 
         @Override
         public void accept(Object document) {
+            if (random.nextDouble() > sample) {
+                return;
+            }
             this.docs.getDocs().add((Documents.Document) document);
         }
 
