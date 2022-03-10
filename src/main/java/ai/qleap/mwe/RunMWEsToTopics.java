@@ -45,18 +45,18 @@ public class RunMWEsToTopics {
 //            Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs.json"), Documents.class);
 //            System.out.println(docs.getDocs().size());
             Random r = new Random(42);
-            MWEs mwes = mapper.readValue(new File("mwes_full_corpus_bi_to_4-grams.json"), MWEs.class);
+            MWEs mwes = mapper.readValue(new File("mwes.json"), MWEs.class);
             System.out.println("total mwes: " + mwes.getMwes().size());
 //            mwes.getMwes().removeIf(next -> next.getNpmi() < 0.5);
 //            mwes.getMwes().removeIf(next -> r.nextDouble() > 0.01);
             System.out.println("cleand mwes: "+ mwes.getMwes().size());
-            Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs.json"), Documents.class);
+            Documents docs = mapper.readValue(new File("business_journeys.jsonl"), Documents.class);
 //            Collections.shuffle(docs.getDocs());
 
 //            docs.getDocs().removeIf(next -> r.nextDouble() > 1.);
 //            docs.getDocs().removeIf(next->!next.getClazz().equals("Outcomes"));
             System.out.println("total docs: " + docs.getDocs().size());
-            Set<String> classes = docs.getDocs().parallelStream().map(Documents.Document::getClazz).collect(Collectors.toSet());
+            Set<String> classes = docs.getDocs().parallelStream().map(d -> d.getMeta().getSpeaker()).collect(Collectors.toSet());
             System.out.println("total classes: " + classes.size());
             System.out.println(classes);
             mwes.setClasses(new ArrayList<>(classes));
@@ -64,9 +64,11 @@ public class RunMWEsToTopics {
                 System.out.println("running: " + cl);
                 new MapToTopics(mwes, docs).run(cl);
             }
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes_full_corpus_bi_to_4-grams_chi2.json"), mwes);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mars.json"), mwes);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 }

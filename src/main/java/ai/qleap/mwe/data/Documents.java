@@ -30,29 +30,30 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class Documents {
 
-    List<Document> docs;
+    List<Document> docs = new ArrayList<>();
 
-//    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
     public static final class Document {
-        @JsonProperty("doc_id")
-        String doc_id;
         @JsonProperty("text")
         String text;
-        @JsonProperty("pattern")
-        String pattern;
-        @JsonProperty("kw_length")
-        Integer kw_length;
-        @JsonProperty("corpus")
-        String corpus;
-        @JsonProperty("paper_id")
-        String paper_id;
-        @JsonProperty("class")
-        String clazz;
+        @JsonProperty("meta")
+        Meta meta;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    public static final class Meta{
+        @JsonProperty("speaker")
+        String speaker;
+
+
+//        "speaker": "Speaker 1", "time": "00:00:07", "interviewee":
     }
 }

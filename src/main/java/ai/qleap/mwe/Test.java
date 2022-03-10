@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020.  qleap.ai
+ * Copyright (c) 2022.  qleap.ai
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,41 +25,39 @@
 package ai.qleap.mwe;
 
 import ai.qleap.mwe.data.Documents;
-import ai.qleap.mwe.data.MWE;
-import ai.qleap.mwe.data.MWEs;
 import ai.qleap.mwe.io.LineBasedJsonReader;
-import ai.qleap.mwe.services.MWEExtractor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Consumer;
 
-public class RunMWEExtraction {
-
-    public static void main(String [] args) {
-
+public class Test {
+    
+    public static void main(String [] args) throws FileNotFoundException {
         ObjectMapper mapper = new ObjectMapper();
-        // JSON file to Java object
-        try {
-            LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
-            Documents docs = parser.parseFile("business_journeys.jsonl");
+        LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
+        List<Documents.Document> docs = new ArrayList<>();
+        Consumer<? super Object> consumer = new TestConsumer(docs);
+        parser.parseAsStream(new FileInputStream(new File("business_journeys.jsonl")), Documents.Document.class,consumer);
+        System.out.println(docs.size());
+    }
 
-//                    mapper.readValue(new File("business_journeys.jsonl"), Documents.class);
-            System.out.println(docs.getDocs().size());
-            Map<String, MWE> map = new MWEExtractor(docs).run();
-//            map.values().stream().map(c-> new MWEs.MWE()).collect(Collectors.toList())
-            List<MWE> mwes = new ArrayList<>(map.values());
-            mwes.sort(Comparator.comparing(MWE::getNpmi));
-            MWEs mweCont = new MWEs(new ArrayList<>(mwes),new ArrayList<>());
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes.json"), mweCont);
+    private static class TestConsumer implements Consumer<Object> {
 
+        private final List<Documents.Document> docs;
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        public TestConsumer(List<Documents.Document> docs) {
+            this.docs = docs;
         }
+
+        @Override
+        public void accept(Object document) {
+            this.docs.add((Documents.Document) document);
+        }
+
     }
 }

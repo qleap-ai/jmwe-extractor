@@ -66,6 +66,7 @@ public class MWEExtractor {
         System.out.println("total tokens: " + toks.get());
         this.numToks = toks.get();
         candMWEs.entrySet().stream().forEach(e->computePMI(e.getValue()));
+
         return candMWEs;
     }
 
@@ -85,7 +86,7 @@ public class MWEExtractor {
     }
 
     private void handle(String t) {
-        String[] words = t.split("\\s+");
+        String[] words = t.toLowerCase().split("\\s+");
         Arrays.stream(words).forEach(w -> unigrams.computeIfAbsent(w, k -> new AtomicInteger(0)).incrementAndGet());
         toks.addAndGet(words.length);
         List<MWE> cands = new ArrayList<>();

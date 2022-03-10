@@ -60,16 +60,16 @@ public class MapToTopics {
                 System.out.println("Docs processed " + processed + " out of " + this.docs.getDocs().size());
             }
             processed++;
-            if (doc.getClazz().equals(topic)) {
+            if (doc.getMeta().getSpeaker().equals(topic)) {
                 topicDocs.add(doc);
-                if (doc.getCorpus().equals("Positive")) {
+//                if (doc.getCorpus().equals("Positive")) {
                     posCnt++;
                     List<MWE> tmp = matcher.matchMWEs(doc.getText());
                     matched.addAll(tmp);
 
 //                    myMWEs.addAll();
 
-                }
+//                }
             }
 
 
@@ -86,7 +86,7 @@ public class MapToTopics {
                 System.out.println("Docs processed " + processed + " out of " + this.docs.getDocs().size());
             }
             processed++;
-            if (doc.getClazz().equals(topic)) {
+            if (doc.getMeta().getSpeaker().equals(topic)) {
                 List<MWE> tmp = myMatcher.matchMWEs(doc.getText());
                 for (MWE m : tmp) {
                     AtomicInteger ai = myMWEs.computeIfAbsent(m, k -> new AtomicInteger(0));
