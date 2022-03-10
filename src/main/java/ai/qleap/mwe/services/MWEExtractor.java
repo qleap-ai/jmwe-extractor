@@ -51,7 +51,7 @@ public class MWEExtractor {
     public Map<String, MWE> run() {
         double total = this.docs.getDocs().size();
         AtomicInteger processed = new AtomicInteger(0);
-        this.docs.getDocs().stream().filter(d-> d.getMeta().getPileSet().equals("StackExchange")).map(Documents.Document::getText).peek(t -> {
+        this.docs.getDocs().parallelStream().filter(d-> d.getMeta().getPileSet().equals("StackExchange")).map(Documents.Document::getText).peek(t -> {
             int pp = processed.incrementAndGet();
             if (pp % 1000 == 0) {
                 System.out.println(pp + " of " + total + " cands thus far " + candMWEs.size());
@@ -60,12 +60,12 @@ public class MWEExtractor {
 //                .limit(10000)
                 .forEach(this::handle);
         System.out.println("candidates: " + candMWEs.size());
-        candMWEs.entrySet().removeIf(e -> e.getValue().getCount().get() < MIN_OCC || e.getValue().getMwe().length() < 7);
+        candMWEs.entrySet().removeIf(e -> e.getValue().getNpmi() < 0 || e.getValue().getCount().get() < MIN_OCC || e.getValue().getMwe().length() < 7);
         System.out.println("filtered candidates: " + candMWEs.size());
         System.out.println("total unique unigrams: " + unigrams.size());
         System.out.println("total tokens: " + toks.get());
         this.numToks = toks.get();
-        candMWEs.entrySet().stream().forEach(e->computePMI(e.getValue()));
+        candMWEs.entrySet().parallelStream().forEach(e->computePMI(e.getValue()));
 
         return candMWEs;
     }
