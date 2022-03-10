@@ -42,7 +42,7 @@ public class MatchMWEs {
     }
 
     public List<MWE> matchMWEs(String text) {
-        String[] words = text.split("\\s+");
+        String[] words = text.toLowerCase().split("\\s+");
         List<String> cands = new ArrayList<>();
         for (int i = 0; i < words.length - 1; i++) {
             StringBuilder sb = new StringBuilder();

@@ -50,8 +50,8 @@ public class Documents {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
     public static final class Meta{
-        @JsonProperty("speaker")
-        String speaker;
+//        @JsonProperty("speaker")
+//        String speaker;
 
         @JsonProperty("pile_set_name")
         String pileSet;

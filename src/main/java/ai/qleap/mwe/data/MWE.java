@@ -53,7 +53,7 @@ public final class MWE {
     @JsonProperty("npmi")
     double npmi;
 
-    Map<String,Double> topicScores = new HashMap<>();
+    Map<String,AtomicInteger> topicScores = new HashMap<>();
 
     public MWE(MWE ci){
         this.mwe = ci.mwe;

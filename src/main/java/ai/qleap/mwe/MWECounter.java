@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020.  qleap.ai
+ * Copyright (c) 2022.  qleap.ai
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,50 +25,51 @@
 package ai.qleap.mwe;
 
 import ai.qleap.mwe.data.Documents;
+import ai.qleap.mwe.data.MWE;
 import ai.qleap.mwe.data.MWEs;
-import ai.qleap.mwe.services.MapToTopics;
+import ai.qleap.mwe.io.LineBasedJsonReader;
+import ai.qleap.mwe.services.MatchMWEs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class RunMWEsToTopics {
+public class MWECounter {
+
+    private final MatchMWEs matcher;
+    Map<String, AtomicInteger> mweCount = new HashMap<>();
+
+    public MWECounter(MatchMWEs matcher){
+        this.matcher = matcher;
+    }
 
     public static void main(String... args) {
         ObjectMapper mapper = new ObjectMapper();
         // JSON file to Java object
         try {
-//            Documents docs = mapper.readValue(new File("chunked_corpus_df_unique_IDs.json"), Documents.class);
-//            System.out.println(docs.getDocs().size());
             Random r = new Random(42);
             MWEs mwes = mapper.readValue(new File("mwes.json"), MWEs.class);
             System.out.println("total mwes: " + mwes.getMwes().size());
-//            mwes.getMwes().removeIf(next -> next.getNpmi() < 0.5);
-//            mwes.getMwes().removeIf(next -> r.nextDouble() > 0.01);
             System.out.println("cleand mwes: "+ mwes.getMwes().size());
-            Documents docs = mapper.readValue(new File("business_journeys.jsonl"), Documents.class);
-//            Collections.shuffle(docs.getDocs());
-
-//            docs.getDocs().removeIf(next -> r.nextDouble() > 1.);
-//            docs.getDocs().removeIf(next->!next.getClazz().equals("Outcomes"));
-            System.out.println("total docs: " + docs.getDocs().size());
-            Set<String> classes = docs.getDocs().parallelStream().map(d -> d.getMeta().getSpeaker()).collect(Collectors.toSet());
-            System.out.println("total classes: " + classes.size());
-            System.out.println(classes);
-            mwes.setClasses(new ArrayList<>(classes));
-            for (String cl : classes) {
-                System.out.println("running: " + cl);
-                new MapToTopics(mwes, docs).run(cl);
-            }
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mars.json"), mwes);
+            MatchMWEs matcher = new MatchMWEs(mwes);
+            LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
+            Documents docs = parser.parseFile("business_journeys.jsonl");
+            MWECounter counter = new MWECounter(matcher);
+            docs.getDocs().parallelStream().forEach(counter::handle);
+            mwes.setCounts(counter.mweCount);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("topics.json"), mwes);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void handle(Documents.Document d) {
+        List<MWE> mwes = matcher.matchMWEs(d.getText());
+        AtomicInteger ai = mweCount.computeIfAbsent(d.getMeta().getPileSet(), k -> new AtomicInteger(0));
+        ai.addAndGet(mwes.size());
+        mwes.forEach(m-> m.getTopicScores().computeIfAbsent(d.getMeta().getPileSet(), k -> new AtomicInteger(0)).incrementAndGet());
+    }
 
 }

@@ -33,10 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RunMWEExtraction {
 
@@ -54,7 +51,7 @@ public class RunMWEExtraction {
 //            map.values().stream().map(c-> new MWEs.MWE()).collect(Collectors.toList())
             List<MWE> mwes = new ArrayList<>(map.values());
             mwes.sort(Comparator.comparing(MWE::getNpmi));
-            MWEs mweCont = new MWEs(new ArrayList<>(mwes),new ArrayList<>());
+            MWEs mweCont = new MWEs(new ArrayList<>(mwes),new ArrayList<>(), new HashMap<>());
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes.json"), mweCont);
 
 
