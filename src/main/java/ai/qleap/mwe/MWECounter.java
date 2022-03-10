@@ -34,12 +34,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MWECounter {
 
     private final MatchMWEs matcher;
-    Map<String, AtomicInteger> mweCount = new HashMap<>();
+    Map<String, AtomicInteger> mweCount = new ConcurrentHashMap<>();
 
     public MWECounter(MatchMWEs matcher){
         this.matcher = matcher;
