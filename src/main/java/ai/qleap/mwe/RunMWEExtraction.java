@@ -29,12 +29,16 @@ import ai.qleap.mwe.data.MWE;
 import ai.qleap.mwe.data.MWEs;
 import ai.qleap.mwe.io.LineBasedJsonReader;
 import ai.qleap.mwe.services.MWEExtractor;
+import ai.qleap.mwe.services.MWEMatcher;
+import ai.qleap.mwe.services.MWERanker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class RunMWEExtraction {
 
@@ -43,21 +47,38 @@ public class RunMWEExtraction {
         ObjectMapper mapper = new ObjectMapper();
         // JSON file to Java object
         try {
-            LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
-            Documents docs = parser.parseFile("business_journeys.jsonl",0.03);
+            //positive corpus
+//            LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
+//            Documents docs = parser.parseFile("positive.jsonl",1);
+//            System.out.println(docs.getDocs().size());
+//            Map<String, MWE> pos_map = new MWEExtractor(docs).run();
+            Map<String, MWE> pos_map = loadAndExtractMWEs("positive.jsonl", mapper,1);
+            Map<String, MWE> neg_map = loadAndExtractMWEs("negative.jsonl", mapper,1);
+            //negative corpus
+            new MWERanker(pos_map,neg_map).run();
 
-//                    mapper.readValue(new File("business_journeys.jsonl"), Documents.class);
-            System.out.println(docs.getDocs().size());
-            Map<String, MWE> map = new MWEExtractor(docs).run();
 //            map.values().stream().map(c-> new MWEs.MWE()).collect(Collectors.toList())
-            List<MWE> mwes = new ArrayList<>(map.values());
-            mwes.sort(Comparator.comparing(MWE::getNpmi));
+            List<MWE> mwes = pos_map.values().stream().filter(mwe -> mwe.getChi2() > 0.0).sorted(Comparator.comparing(MWE::getChi2)).collect(Collectors.toList());
             MWEs mweCont = new MWEs(new ArrayList<>(mwes),new ArrayList<>(), new ConcurrentHashMap<>());
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File("mwes.json"), mweCont);
 
-
+            List<MWE> filteredMWEs = mwes.stream().filter(mwe -> mwe.getChi2() > 0.0).collect(Collectors.toList());
+            MWEMatcher matcher = new MWEMatcher(filteredMWEs,3);
+            List<MWE> res = matcher.match("FA Oberteil, f. Selbstschlussvtl. DN15, duschen, fernbetätigt, 2000104403");
+            res.stream().forEach(mwe -> System.out.println(mwe.getMwe() + " " + mwe.getChi2()));
+            System.out.println("=====");
+            res = matcher.match("Absperrklappe, als Endarmatur, Gehäuse aus Gusseisen EN-GJL-250, DN 15, Nenndruck 0,6 MPa (6 bar), für Trinkwasser DIN 1988-200, weich dichtend, geeignet für Fremdbetätigung.");
+            res.stream().forEach(mwe -> System.out.println(mwe.getMwe() + " " + mwe.getChi2()));
+//            System.out.println();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static Map<String, MWE> loadAndExtractMWEs(String filename, ObjectMapper mapper, double sample) throws FileNotFoundException {
+        LineBasedJsonReader parser = new LineBasedJsonReader(mapper);
+        Documents docs = parser.parseFile(filename,sample);
+        System.out.println(docs.getDocs().size());
+        return new MWEExtractor(docs).run();
     }
 }

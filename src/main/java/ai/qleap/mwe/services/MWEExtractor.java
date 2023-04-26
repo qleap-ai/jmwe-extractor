@@ -30,7 +30,8 @@ import ai.qleap.mwe.data.MWE;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 public class MWEExtractor {
 
     public static final int NGRAMM = 4;
@@ -87,22 +88,36 @@ public class MWEExtractor {
     }
 
     private void handle(String t) {
-        String[] words = t.toLowerCase().split("\\s+");
+        if (t==null){
+            return;
+        }
+        String[] words = t.toLowerCase(Locale.GERMAN).split("\\s+");
         Arrays.stream(words).forEach(w -> unigrams.computeIfAbsent(w, k -> new AtomicInteger(0)).incrementAndGet());
+
         toks.addAndGet(words.length);
         List<MWE> cands = new ArrayList<>();
+        Arrays.stream(words).forEach(w -> cands.add(new MWE(w, Collections.singletonList(w))));
+
         for (int i = 0; i < words.length - 1; i++) {
             StringBuilder sb = new StringBuilder();
             String w = words[i];
+//            System.out.println(w);
             sb.append(w);
             List<String> toks = new ArrayList<>();
             toks.add(w);
             for (int j = i + 1; j < Math.min(words.length - 1, i + NGRAMM); j++) {
-                sb.append("_");
                 String w2 = words[j];
+                if (w2.equals("none")){
+                    break;
+                }
+
+                sb.append("_");
+                if (sb.toString().startsWith("_")){
+                    sb.deleteCharAt(0);
+                }
                 sb.append(w2);
                 toks.add(w2);
-                MWE ci = new MWE(sb.toString(),new ArrayList<>(toks));
+                MWE ci = new MWE(removePunctuationAtEnd(sb.toString()), new ArrayList<>(toks));
                 cands.add(ci);
             }
         }
@@ -116,4 +131,46 @@ public class MWEExtractor {
         }
     }
 
+    public static void main(String ... args) {
+        String text = "Absperrklappe, als Endarmatur, Gehäuse aus Gusseisen EN-GJL-250, DN 15, Nenndruck 0,6 MPa (6 bar), für Trinkwasser DIN 1988-200, weich dichtend, geeignet für Fremdbetätigung.";
+
+        String[] words = text.toLowerCase(Locale.GERMAN).split("\\s+");
+
+
+        List<MWE> cands = new ArrayList<>();
+        for (int i = 0; i < words.length - 1; i++) {
+            StringBuilder sb = new StringBuilder();
+            String w = words[i];
+            System.out.println(w);
+            sb.append(w);
+            List<String> toks = new ArrayList<>();
+            toks.add(w);
+            for (int j = i + 1; j < Math.min(words.length - 1, i + NGRAMM); j++) {
+                String w2 = words[j];
+                if (w2.equals("none")){
+                    break;
+                }
+
+                sb.append("_");
+                if (sb.toString().startsWith("_")){
+                    sb.deleteCharAt(0);
+                }
+                sb.append(w2);
+                toks.add(w2);
+                MWE ci = new MWE(removePunctuationAtEnd(sb.toString()), new ArrayList<>(toks));
+                cands.add(ci);
+            }
+        }
+        System.out.println(cands);
+    }
+
+    public static String removePunctuationAtEnd(String input) {
+        Pattern pattern = Pattern.compile("(.*?)[.,;:]$");
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return input;
+        }
+    }
 }

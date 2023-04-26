@@ -54,6 +54,8 @@ public final class MWE {
     @JsonProperty("npmi")
     double npmi;
 
+    @JsonProperty("chi2")
+    double chi2;
     ConcurrentHashMap<String,AtomicInteger> topicScores = new ConcurrentHashMap<>();
 
     public MWE(MWE ci){
@@ -64,5 +66,10 @@ public final class MWE {
     public MWE(String mwe, List<String> toks) {
         this.mwe = mwe;
         this.toks = toks;
+    }
+
+    @Override
+    public String toString() {
+        return this.mwe;
     }
 }
